@@ -21,6 +21,7 @@ var defaultOptions = zoomNS.defaults = {
 		drag: false,
 		mode: 'xy',
 		sensitivity: 3,
+		keepMetadataOnReset: false,
 	}
 };
 
@@ -75,8 +76,8 @@ var zoomPlugin = {
 
 		// init default options so we don't have to check if keys exist all the time
 		var options = chartInstance.options;
-		options.zoom = helpers.extend(options.zoom || {}, defaultOptions.zoom);
-		options.pan = helpers.extend(options.pan || {}, defaultOptions.pan);
+		options.zoom = helpers.extend({}, defaultOptions.zoom, options.zoom || {});
+		options.pan = helpers.extend({}, defaultOptions.pan, options.pan || {});
 
 		// create chart functions
 		for(var addonKey in addons) {

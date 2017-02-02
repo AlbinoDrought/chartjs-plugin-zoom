@@ -36,9 +36,11 @@ function resetZoom(chartInstance, actuallyStoreInstead) {
         scale.options = helpers.configMerge(scale.options, scale.originalOptions);
     });
 
-    helpers.each(chartInstance.data.datasets, function(dataset, id) {
-        dataset._meta = null;
-    });
+    if(!chartInstance.options.zoom.keepMetadataOnReset) {
+        helpers.each(chartInstance.data.datasets, function (dataset, id) {
+            dataset._meta = null;
+        });
+    }
 
     chartInstance.update();
 };
