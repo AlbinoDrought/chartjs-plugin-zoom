@@ -8,8 +8,18 @@
     "type": "git",
     "url": "https://github.com/chartjs/chartjs-plugin-zoom.git"
   },
+  "browserify-shim": {
+    "chart.js": "global:Chart",
+    "hammerjs": "global:Hammer"
+  },
+  "browserify": {
+    "transform": [
+      "browserify-shim"
+    ]
+  },
   "devDependencies": {
     "browserify": "^13.0.0",
+    "browserify-shim": "^3.8.13",
     "gulp": "3.9.x",
     "gulp-concat": "^2.6.0",
     "gulp-insert": "^0.5.0",
