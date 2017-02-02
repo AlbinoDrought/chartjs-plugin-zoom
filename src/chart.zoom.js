@@ -8,10 +8,6 @@ var helpers = Chart.helpers;
 // Take the zoom namespace of Chart
 var zoomNS = Chart.Zoom = Chart.Zoom || {};
 
-// Where we store functions to handle different scale types
-var zoomFunctions = zoomNS.zoomFunctions = zoomNS.zoomFunctions || {};
-var panFunctions = zoomNS.panFunctions = zoomNS.panFunctions || {};
-
 // Default options if none are provided
 var defaultOptions = zoomNS.defaults = {
 	pan: {
@@ -25,110 +21,6 @@ var defaultOptions = zoomNS.defaults = {
 		mode: 'xy',
 		sensitivity: 3,
 	}
-};
-
-function directionEnabled(mode, dir) {
-	if (mode === undefined) {
-		return true;
-	} else if (typeof mode === 'string') {
-		return mode.indexOf(dir) !== -1;
-	}
-
-	return false;
-}
-
-function zoomScale(scale, zoom, center, zoomOptions) {
-	var fn = zoomFunctions[scale.options.type];
-	if (fn) {
-		fn(scale, zoom, center, zoomOptions);
-	}
-}
-
-function doZoom(chartInstance, zoom, center) {
-	var ca = chartInstance.chartArea;
-	if (!center) {
-		center = {
-			x: (ca.left + ca.right) / 2,
-			y: (ca.top + ca.bottom) / 2,
-		};
-	}
-
-	var zoomOptions = chartInstance.options.zoom;
-
-	// Do the zoom here
-	var zoomMode = helpers.getValueOrDefault(chartInstance.options.zoom.mode, defaultOptions.zoom.mode);
-	zoomOptions.sensitivity = helpers.getValueOrDefault(chartInstance.options.zoom.sensitivity, defaultOptions.zoom.sensitivity);
-
-	helpers.each(chartInstance.scales, function(scale, id) {
-		if (scale.isHorizontal() && directionEnabled(zoomMode, 'x')) {
-			zoomScale(scale, zoom, center, zoomOptions);
-		} else if (!scale.isHorizontal() && directionEnabled(zoomMode, 'y')) {
-			// Do Y zoom
-			zoomScale(scale, zoom, center, zoomOptions);
-		}
-	});
-
-	chartInstance.update(0);
-}
-
-function panScale(scale, delta, panOptions) {
-	var fn = panFunctions[scale.options.type];
-	if (fn) {
-		fn(scale, delta, panOptions);
-	}
-}
-
-function doPan(chartInstance, deltaX, deltaY) {
-	var panOptions = chartInstance.options.pan;
-	var panMode = helpers.getValueOrDefault(chartInstance.options.pan.mode, defaultOptions.pan.mode);
-	panOptions.speed = helpers.getValueOrDefault(chartInstance.options.pan.speed, defaultOptions.pan.speed);
-
-	helpers.each(chartInstance.scales, function(scale, id) {
-		if (scale.isHorizontal() && directionEnabled(panMode, 'x') && deltaX !== 0) {
-			panScale(scale, deltaX, panOptions);
-		} else if (!scale.isHorizontal() && directionEnabled(panMode, 'y') && deltaY !== 0) {
-			panScale(scale, deltaY, panOptions);
-		}
-	});
-
-	chartInstance.update(0);
-}
-
-function getYAxis(chartInstance) {
-	var scales = chartInstance.scales;
-
-	for (var scaleId in scales) {
-		var scale = scales[scaleId];
-
-		if (!scale.isHorizontal()) {
-			return scale;
-		}
-	}
-}
-
-function resetZoom(chartInstance) {
-	helpers.each(chartInstance.scales, function(scale, id) {
-		var timeOptions = scale.options.time;
-		var tickOptions = scale.options.ticks;
-
-		if (timeOptions) {
-			delete timeOptions.min;
-			delete timeOptions.max;
-		}
-
-		if (tickOptions) {
-			delete tickOptions.min;
-			delete tickOptions.max;
-		}
-
-		scale.options = helpers.configMerge(scale.options, scale.originalOptions);
-	});
-
-	helpers.each(chartInstance.data.datasets, function(dataset, id) {
-		dataset._meta = null;
-	});
-
-	chartInstance.update();
 };
 
 /**
@@ -166,13 +58,15 @@ function runHandlers(handlers, method, chartInstance) {
 
 // Store these for later
 var scaleFunctions = require('./scales');
-helpers.extend(zoomNS.zoomFunctions, scaleFunctions.zoomFunctions);
-helpers.extend(zoomNS.panFunctions, scaleFunctions.panFunctions);
+zoomNS.zoomFunctions = scaleFunctions.zoomFunctions;
+zoomNS.panFunctions = scaleFunctions.panFunctions;
 zoomNS.handlers = require('./handlers');
+zoomNS.addons = require('./addons');
 
 // Chartjs Zoom Plugin
 var zoomPlugin = {
 	afterInit: function(chartInstance) {
+		// store original scale options for resetZoom()
 		helpers.each(chartInstance.scales, function(scale) {
 			scale.originalOptions = JSON.parse(JSON.stringify(scale.options));
 		});
@@ -186,10 +80,9 @@ var zoomPlugin = {
 		options.pan = helpers.extend(options.pan || {}, defaultOptions.pan);
 
 		// create chart functions
-		chartInstance.doZoom = strapFunc(doZoom, chartInstance);
-		chartInstance.doPan = strapFunc(doPan, chartInstance);
-		chartInstance.getYAxis = strapFunc(getYAxis, chartInstance);
-		chartInstance.resetZoom = strapFunc(resetZoom, chartInstance);
+		for(var addonKey in zoomNS.addons) {
+			chartInstance[addonKey] = strapFunc(zoomNS.addons[addonKey], chartInstance);
+		}
 
 		chartInstance.zoom.handlers = [];
 		for(var i = 0; i < zoomNS.handlers.length; i++) {
