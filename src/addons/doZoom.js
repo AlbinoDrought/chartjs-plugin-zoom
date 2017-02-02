@@ -5,16 +5,7 @@ var Chart = require('chart.js');
 var helpers = Chart.helpers;
 var zoomNS = Chart.Zoom;
 
-// todo: move somewhere else (code dupe between doPan doZoom)
-function directionEnabled(mode, dir) {
-    if (mode === undefined) {
-        return true;
-    } else if (typeof mode === 'string') {
-        return mode.indexOf(dir) !== -1;
-    }
-
-    return false;
-}
+var directionEnabled = require('./directionEnabled');
 
 function zoomScale(scale, zoom, center, zoomOptions) {
     var fn = zoomNS.zoomFunctions[scale.options.type];
