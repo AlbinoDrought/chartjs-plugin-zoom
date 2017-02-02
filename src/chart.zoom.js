@@ -60,8 +60,8 @@ function runHandlers(handlers, method, chartInstance) {
 var scaleFunctions = require('./scales');
 zoomNS.zoomFunctions = scaleFunctions.zoomFunctions;
 zoomNS.panFunctions = scaleFunctions.panFunctions;
-zoomNS.handlers = require('./handlers');
-zoomNS.addons = require('./addons');
+var handlers = zoomNS.handlers = require('./handlers');
+var addons = zoomNS.addons = require('./addons');
 
 // Chartjs Zoom Plugin
 var zoomPlugin = {
@@ -74,19 +74,22 @@ var zoomPlugin = {
 	beforeInit: function(chartInstance) {
 		chartInstance.zoom = {};
 
-		// init default options
+		// init default options so we don't have to check if keys exist all the time
 		var options = chartInstance.options;
 		options.zoom = helpers.extend(options.zoom || {}, defaultOptions.zoom);
 		options.pan = helpers.extend(options.pan || {}, defaultOptions.pan);
 
 		// create chart functions
-		for(var addonKey in zoomNS.addons) {
+		for(var addonKey in addons) {
+			if(!addons.hasOwnProperty(addonKey)) continue;
+
 			chartInstance[addonKey] = strapFunc(zoomNS.addons[addonKey], chartInstance);
 		}
 
+		// add enabled handlers
 		chartInstance.zoom.handlers = [];
-		for(var i = 0; i < zoomNS.handlers.length; i++) {
-			var handler = zoomNS.handlers[i];
+		for(var i = 0; i < handlers.length; i++) {
+			var handler = handlers[i];
 			if(handler.isEnabled(chartInstance)) {
 				chartInstance.zoom.handlers.push(handler);
 
@@ -104,6 +107,7 @@ var zoomPlugin = {
 
 		runHandlers(chartInstance.zoom.handlers, "beforeDatasetsDraw", chartInstance);
 
+		// hide all plotted data outside of the chart area
 		ctx.rect(chartArea.left, chartArea.top, chartArea.right - chartArea.left, chartArea.bottom - chartArea.top);
 		ctx.clip();
 	},
