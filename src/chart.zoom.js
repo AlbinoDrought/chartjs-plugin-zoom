@@ -101,11 +101,6 @@ function doPan(chartInstance, deltaX, deltaY) {
 	}
 }
 
-function positionInChartArea(chartInstance, position) {
-	return 	(position.x >= chartInstance.chartArea.left && position.x <= chartInstance.chartArea.right) &&
-		(position.y >= chartInstance.chartArea.top && position.y <= chartInstance.chartArea.bottom);
-}
-
 function getYAxis(chartInstance) {
 	var scales = chartInstance.scales;
 
