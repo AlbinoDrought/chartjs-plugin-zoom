@@ -4,7 +4,21 @@
 var Chart = require('chart.js');
 var helpers = Chart.helpers;
 
-function resetZoom(chartInstance) {
+function storeScaleOptions(chartInstance) {
+    helpers.each(chartInstance.scales, function(scale) {
+        scale.originalOptions = JSON.parse(JSON.stringify(scale.options));
+    });
+}
+
+/***
+ * Attempts to return scales on the given chartInstance to their stored (original) state
+ *
+ * @param chartInstance
+ * @param actuallyStoreInstead
+ */
+function resetZoom(chartInstance, actuallyStoreInstead) {
+    if(actuallyStoreInstead) return storeScaleOptions(chartInstance);
+
     helpers.each(chartInstance.scales, function(scale, id) {
         var timeOptions = scale.options.time;
         var tickOptions = scale.options.ticks;

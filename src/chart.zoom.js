@@ -18,6 +18,7 @@ var defaultOptions = zoomNS.defaults = {
 	},
 	zoom: {
 		enabled: true,
+		drag: false,
 		mode: 'xy',
 		sensitivity: 3,
 	}
@@ -67,9 +68,7 @@ var addons = zoomNS.addons = require('./addons');
 var zoomPlugin = {
 	afterInit: function(chartInstance) {
 		// store original scale options for resetZoom()
-		helpers.each(chartInstance.scales, function(scale) {
-			scale.originalOptions = JSON.parse(JSON.stringify(scale.options));
-		});
+		chartInstance.resetZoom(true);
 	},
 	beforeInit: function(chartInstance) {
 		chartInstance.zoom = {};
