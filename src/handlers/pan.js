@@ -1,7 +1,8 @@
 /**
  * Created by Sean on 2/2/2017.
  */
-var Hammer = require('hammerjs');
+var Hammer = require('hammerjs'),
+    autoLimit = require('./auto-limits');
 
 module.exports = {
     isEnabled: function(chartInstance) {
@@ -12,7 +13,11 @@ module.exports = {
 
     beforeInit: function(chartInstance) {
         var node = chartInstance.zoom.node = chartInstance.chart.ctx.canvas;
-        var options = chartInstance.options;
+        var options = chartInstance.options,
+            panOptions = options.pan,
+            limits = panOptions.limits;
+
+        panOptions.limits = autoLimit(chartInstance, limits);
 
         var mc = chartInstance._mc || new Hammer.Manager(node);
         mc.add(new Hammer.Pan({
@@ -27,7 +32,7 @@ module.exports = {
                 var deltaY = e.deltaY - currentDeltaY;
                 currentDeltaX = e.deltaX;
                 currentDeltaY = e.deltaY;
-                chartInstance.doPan(deltaX, deltaY);
+                chartInstance.doPan(deltaX, deltaY, panOptions);
             }
         };
 

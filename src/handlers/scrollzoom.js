@@ -1,7 +1,8 @@
 /**
  * Created by Sean on 2/2/2017.
  */
-var Hammer = require('hammerjs');
+var Hammer = require('hammerjs'),
+    autoLimit = require('./auto-limits');
 
 module.exports = {
     isEnabled: function(chartInstance) {
@@ -11,7 +12,12 @@ module.exports = {
     },
 
     beforeInit: function(chartInstance) {
-        var node = chartInstance.zoom.node = chartInstance.chart.ctx.canvas;
+        var node = chartInstance.zoom.node = chartInstance.chart.ctx.canvas,
+            options = chartInstance.options,
+            zoomOptions = options.zoom,
+            limits = zoomOptions.limits;
+
+        zoomOptions.limits = autoLimit(chartInstance, limits);
 
         chartInstance.zoom._wheelHandler = function(event) {
             var rect = event.target.getBoundingClientRect();
@@ -24,9 +30,9 @@ module.exports = {
             };
 
             if (event.deltaY < 0) {
-                chartInstance.doZoom(1.1, center);
+                chartInstance.doZoom(1.1, center, zoomOptions);
             } else {
-                chartInstance.doZoom(0.909, center);
+                chartInstance.doZoom(0.909, center, zoomOptions);
             }
             // Prevent the event from triggering the default behavior (eg. Content scrolling).
             event.preventDefault();
@@ -42,7 +48,7 @@ module.exports = {
             var currentPinchScaling;
             var handlePinch = function handlePinch(e) {
                 var diff = 1 / (currentPinchScaling) * e.scale;
-                chartInstance.doZoom(diff, e.center);
+                chartInstance.doZoom(diff, e.center, zoomOptions);
 
                 // Keep track of overall scale
                 currentPinchScaling = e.scale;

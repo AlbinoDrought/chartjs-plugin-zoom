@@ -3,10 +3,11 @@
  */
 var Chart = require('chart.js');
 var helpers = Chart.helpers;
+var clone = require('clone');
 
 function storeScaleOptions(chartInstance) {
     helpers.each(chartInstance.scales, function(scale) {
-        scale.originalOptions = JSON.parse(JSON.stringify(scale.options));
+        scale.originalOptions = clone(scale.options);
     });
 }
 

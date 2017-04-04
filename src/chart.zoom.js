@@ -15,13 +15,34 @@ var defaultOptions = zoomNS.defaults = {
 		mode: 'xy',
 		speed: 20,
 		threshold: 10,
+		limits: {
+			x: {
+				min: undefined,
+				max: undefined,
+			},
+			y: {
+				min: undefined,
+				max: undefined,
+			}
+		},
 	},
+
 	zoom: {
 		enabled: true,
 		drag: false,
 		mode: 'xy',
 		sensitivity: 3,
 		keepMetadataOnReset: false,
+		limits: {
+            x: {
+                min: undefined,
+                max: undefined,
+            },
+            y: {
+                min: undefined,
+                max: undefined,
+            }
+        },
 	}
 };
 
