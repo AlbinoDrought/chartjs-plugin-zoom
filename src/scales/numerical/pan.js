@@ -25,7 +25,7 @@ function panNumericalScale(scale, delta, panOptions) {
     // if we do pan out of our boundaries, minimize the badness
     if(newStart <= minLimit) {
         newStart = minLimit;
-        newEnd = (end - start) - newStart;
+        newEnd = newStart + (end - start);
     } else if(newEnd >= maxLimit) {
         newEnd = maxLimit;
         newStart = newEnd - (end - start);

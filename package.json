@@ -1,7 +1,7 @@
 {
   "name": "chartjs-plugin-zoom-albinodrought",
   "description": "Simple HTML5 charts using the canvas element.",
-  "version": "0.4.28",
+  "version": "0.4.30",
   "license": "MIT",
   "main": "src/chart.zoom.js",
   "repository": {
