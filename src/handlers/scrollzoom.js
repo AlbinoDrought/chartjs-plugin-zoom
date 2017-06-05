@@ -40,31 +40,30 @@ module.exports = {
 
         node.addEventListener('wheel', chartInstance.zoom._wheelHandler);
 
-        if(Hammer) {
-            var mc = chartInstance._mc || new Hammer.Manager(node);
-            mc.add(new Hammer.Pinch());
+        var mc = chartInstance._mc || new Hammer.Manager(node);
+        mc.add(new Hammer.Pinch());
 
-            // Hammer reports the total scaling. We need the incremental amount
-            var currentPinchScaling;
-            var handlePinch = function handlePinch(e) {
-                var diff = 1 / (currentPinchScaling) * e.scale;
-                chartInstance.doZoom(diff, e.center, zoomOptions);
+        // Hammer reports the total scaling. We need the incremental amount
+        var currentPinchScaling;
+        var handlePinch = function handlePinch(e) {
+            var diff = 1 / (currentPinchScaling) * e.scale;
+            chartInstance.doZoom(diff, e.center, zoomOptions);
 
-                // Keep track of overall scale
-                currentPinchScaling = e.scale;
-            };
+            // Keep track of overall scale
+            currentPinchScaling = e.scale;
+        };
 
-            mc.on('pinchstart', function(e) {
-                currentPinchScaling = 1; // reset tracker
-            });
-            mc.on('pinch', handlePinch);
-            mc.on('pinchend', function(e) {
-                handlePinch(e);
-                currentPinchScaling = null; // reset
-            });
+        mc.on('pinchstart', function(e) {
+            currentPinchScaling = 1; // reset tracker
+        });
+        mc.on('pinch', handlePinch);
+        mc.on('pinchend', function(e) {
+            handlePinch(e);
+            currentPinchScaling = null; // reset
+        });
 
-            chartInstance._mc = mc;
-        }
+        chartInstance._mc = mc;
+
     },
 
     destroy: function(chartInstance) {
@@ -73,6 +72,7 @@ module.exports = {
         node.removeEventListener('mousedown', chartInstance.zoom._mouseDownHandler);
         node.removeEventListener('mousemove', chartInstance.zoom._mouseMoveHandler);
         node.removeEventListener('mouseup', chartInstance.zoom._mouseUpHandler);
+        node.removeEventListener('wheel', chartInstance.zoom._wheelHandler);
 
         if(Hammer) {
             var mc = chartInstance._mc;
