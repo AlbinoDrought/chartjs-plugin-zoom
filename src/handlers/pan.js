@@ -21,7 +21,8 @@ module.exports = {
 
         var mc = chartInstance._mc || new Hammer.Manager(node);
         mc.add(new Hammer.Pan({
-            threshold: options.pan.threshold
+            threshold: options.pan.threshold,
+            direction: options.pan.mode === 'x' ? Hammer.DIRECTION_HORIZONTAL : options.pan.mode === 'y' ? Hammer.DIRECTION_VERTICAL : Hammer.DIRECTION_ALL
         }));
 
         var currentDeltaX = null, currentDeltaY = null, panning = false;
