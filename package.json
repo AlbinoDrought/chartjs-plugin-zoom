@@ -1,7 +1,7 @@
 {
   "name": "chartjs-plugin-zoom-albinodrought",
   "description": "Simple HTML5 charts using the canvas element.",
-  "version": "0.4.30",
+  "version": "0.4.35",
   "license": "MIT",
   "main": "src/chart.zoom.js",
   "repository": {
@@ -9,8 +9,7 @@
     "url": "https://github.com/chartjs/chartjs-plugin-zoom.git"
   },
   "browserify-shim": {
-    "chart.js": "global:Chart",
-    "hammerjs": "global:Hammer"
+    "chart.js": "global:Chart"
   },
   "browserify": {
     "transform": [
